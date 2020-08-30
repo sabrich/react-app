@@ -2,22 +2,30 @@ import React from "react";
 
 import FormInput from "../form-input/Form-input.component";
 import CustonButton from "../custom-button/Custom-button.component";
-import { signInWithGoogle } from "../../firebase/firebase.utils";
+
+import { auth, signInWithGoogle } from "../../firebase/firebase.utils";
 
 import "./Sign-in.styles.scss";
 
 class SignIn extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       email: "",
       password: "",
     };
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
-    this.state({ email: "", password: "" });
+    const { email, password } = this.state;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      this.state({ email: "", password: "" });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   handleChange = (event) => {
@@ -47,13 +55,14 @@ class SignIn extends React.Component {
             required
             handleChange={this.handleChange}
           />
+
+          <div className="buttons">
+            <CustonButton type="submit">Sign in</CustonButton>
+            <CustonButton isGoogleSignIn onClick={signInWithGoogle}>
+              Sign in with Google
+            </CustonButton>
+          </div>
         </form>
-        <div className="buttons">
-          <CustonButton type="submit">Sign in</CustonButton>
-          <CustonButton isGoogleSignIn onClick={signInWithGoogle}>
-            Sign in with Google
-          </CustonButton>
-        </div>
       </div>
     );
   }
